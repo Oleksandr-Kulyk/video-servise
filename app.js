@@ -9,6 +9,7 @@ import { bucket } from "./config/cloudStorageConfig.js";
 import upload from "./config/multerConfig.js";
 import Episode from "./models/episode.js";
 import loginRoter from "./routes/loginRoutes.js";
+import registerRouter from './routes/registerRoutes.js'
 import checkAuth from "./middleware/checkAuth.js";
 
 dotenv.config();
@@ -23,6 +24,7 @@ app.use(bodyParser.json());
 app.use(cookieParser());
 
 app.use("/login", loginRoter);
+app.use('/register', registerRouter);
 
 app.get("/", (req, res) => res.status(200).render("home"));
 
