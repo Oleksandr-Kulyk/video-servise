@@ -2,15 +2,20 @@ import dotenv from "dotenv";
 import express from "express";
 import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
+import morgan from "morgan";
+import passport from "passport";
 import { engine } from "express-handlebars";
 import "./config/dbConfig.js";
 import handlebarsConfig from "./config/handlebarsConfig.js";
+import configureLocalStrategy from "./config/localStrategyConfig.js";
 import { bucket } from "./config/cloudStorageConfig.js";
 import upload from "./config/multerConfig.js";
 import Episode from "./models/episode.js";
 import loginRoter from "./routes/loginRoutes.js";
-import registerRouter from './routes/registerRoutes.js'
+import registerRouter from "./routes/registerRoutes.js";
 import checkAuth from "./middleware/checkAuth.js";
+import sessionConfig from "./config/sessionConfig.js";
+import * as passportConfig from "./config/passportConfig.js";
 
 dotenv.config();
 
@@ -22,11 +27,21 @@ app.engine("handlebars", engine(handlebarsConfig));
 app.set("view engine", "handlebars");
 app.use(bodyParser.json());
 app.use(cookieParser());
+app.use(morgan("combined"));
+app.use(sessionConfig);
+app.use(passport.initialize());
+app.use(passport.session());
+passport.use(configureLocalStrategy());
+passport.serializeUser(passportConfig.serialize);
+passport.deserializeUser(passportConfig.deserialize);
 
 app.use("/login", loginRoter);
-app.use('/register', registerRouter);
+app.use("/register", registerRouter);
 
-app.get("/", (req, res) => res.status(200).render("home"));
+app.get("/", (req, res) => {
+  console.log(req.user);
+  res.status(200).render("home");
+});
 
 app.post("/upload", upload.single("video"), async (req, res) => {
   const blob = bucket.file(req.file.originalname);
