@@ -1,8 +1,10 @@
 const checkAuth = (req, res, next) => {
-  if (!req.cookies.user) {
-    return res.status(303).redirect("/login");
+  if (req.isAuthenticated()) {
+    return next();
+  } else {
+    req.session.returnTo = req.originalUrl;
+    return res.redirect("/login");
   }
-  return next();
 };
 
 export default checkAuth;

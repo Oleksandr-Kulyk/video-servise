@@ -7,5 +7,9 @@ export const loginGetController = (req, res) => {
 };
 
 export const loginPostController = async (req, res) => {
-  res.redirect("/");
+  if (req.session.returnTo) {
+    const returnTo = req.session.returnTo;
+    delete req.session.returnTo;
+    res.redirect(returnTo);
+  }
 };

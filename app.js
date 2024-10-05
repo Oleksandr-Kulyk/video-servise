@@ -39,7 +39,6 @@ app.use("/login", loginRoter);
 app.use("/register", registerRouter);
 
 app.get("/", (req, res) => {
-  console.log(req.user);
   res.status(200).render("home");
 });
 
